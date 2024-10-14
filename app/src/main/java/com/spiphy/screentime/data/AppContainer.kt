@@ -1,6 +1,7 @@
 package com.spiphy.screentime.data
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.spiphy.screentime.network.HistoryApiService
 import com.spiphy.screentime.network.TicketApiService
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -8,6 +9,7 @@ import retrofit2.Retrofit
 
 interface AppContainer {
     val ticketRepository: TicketRepository
+    val historyRepository: HistoryRepository
 }
 
 class DefaultAppContainer : AppContainer {
@@ -18,11 +20,19 @@ class DefaultAppContainer : AppContainer {
         .baseUrl(baseUrl)
         .build()
 
-    private val retrofitService: TicketApiService by lazy {
+    private val retrofitTicketService: TicketApiService by lazy {
         retrofit.create(TicketApiService::class.java)
     }
 
+    private val retrofitHistoryService: HistoryApiService by lazy {
+        retrofit.create(HistoryApiService::class.java)
+    }
+
     override val ticketRepository: TicketRepository by lazy {
-        NetworkTicketRepository(retrofitService)
+        NetworkTicketRepository(retrofitTicketService)
+    }
+
+    override val historyRepository: HistoryRepository by lazy {
+        NetworkHistoryRepository(retrofitHistoryService)
     }
 }
