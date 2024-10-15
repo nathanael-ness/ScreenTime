@@ -45,4 +45,5 @@
     <string name="custom_reason">Custom reason</string>
     <string name="redeem_star">Redeem Star</string>
     <string name="custom">Custom</string>
+    <string name="retry">Retry</string>
 </resources>

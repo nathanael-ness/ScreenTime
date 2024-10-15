@@ -42,7 +42,7 @@ class HistoryViewModel(private val historyRepository: HistoryRepository) : ViewM
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                val application =(this[APPLICATION_KEY] as ScreenTimeApplication)
+                val application = (this[APPLICATION_KEY] as ScreenTimeApplication)
                 val historyRepository = application.container.historyRepository
                 HistoryViewModel(historyRepository = historyRepository)
             }

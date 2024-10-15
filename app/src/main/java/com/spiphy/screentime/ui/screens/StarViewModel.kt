@@ -23,7 +23,10 @@ sealed interface StarUiState {
     object Loading : StarUiState
 }
 
-class StarViewModel(private val starRepository: StarRepository, private val ticketRepository: TicketRepository) : ViewModel() {
+class StarViewModel(
+    private val starRepository: StarRepository,
+    private val ticketRepository: TicketRepository
+) : ViewModel() {
     var starUiState: StarUiState by mutableStateOf(StarUiState.Loading)
         private set
 
@@ -42,7 +45,7 @@ class StarViewModel(private val starRepository: StarRepository, private val tick
         }
     }
 
-    fun awardStar(note: String){
+    fun awardStar(note: String) {
         viewModelScope.launch {
             starRepository.addStar(note)
             getAllStars()
@@ -53,7 +56,8 @@ class StarViewModel(private val starRepository: StarRepository, private val tick
         viewModelScope.launch {
             val sg = starGroup.copy(
                 used = true,
-                date = Clock.System.now().toString()
+                date = Clock.System.now().toString(),
+                note = note
             )
             starRepository.updateStarGroup(sg)
             getAllStars()
@@ -69,7 +73,7 @@ class StarViewModel(private val starRepository: StarRepository, private val tick
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
-                val application =(this[APPLICATION_KEY] as ScreenTimeApplication)
+                val application = (this[APPLICATION_KEY] as ScreenTimeApplication)
                 val starRepository = application.container.starRepository
                 val ticketRepository = application.container.ticketRepository
                 StarViewModel(starRepository = starRepository, ticketRepository = ticketRepository)

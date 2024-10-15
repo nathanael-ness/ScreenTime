@@ -15,44 +15,35 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.spiphy.screentime.R
 import com.spiphy.screentime.model.Ticket
 import com.spiphy.screentime.model.TicketRedemption
+import com.spiphy.screentime.model.TicketRedemptionMap
 import com.spiphy.screentime.model.TicketType
 import com.spiphy.screentime.model.testTickets
-import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import com.spiphy.screentime.ui.screens.components.ErrorScreen
+import com.spiphy.screentime.ui.screens.components.GenericDialog
+import com.spiphy.screentime.ui.screens.components.LoadingScreen
 import kotlinx.datetime.Clock
 
 private val showRedeemDialog = mutableStateOf(false)
@@ -72,46 +63,99 @@ fun HomeScreen(
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     when (ticketUiState) {
-        is TicketUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize(), contentPadding = contentPadding)
+        is TicketUiState.Loading -> LoadingScreen(
+            modifier = Modifier,
+            contentPadding = contentPadding
+        )
+
         is TicketUiState.Success -> {
             onAwardTicket = { ticketType, note -> viewModel.awardTicket(ticketType, note) }
-            onRedeemTicket = { ticket -> if(ticketUiState.screenTime < max_screen_time) viewModel.redeemTicket(ticket) }
+            onRedeemTicket = { ticket ->
+                if (ticketUiState.screenTime < max_screen_time) viewModel.redeemTicket(ticket)
+            }
             TicketsScreen(
-                ticketUiState.tickets, ticketUiState.screenTime, contentPadding = contentPadding, modifier = modifier.fillMaxWidth()
+                ticketUiState.tickets,
+                ticketUiState.screenTime,
+                contentPadding = contentPadding
             )
         }
-        is TicketUiState.Error -> TicketsScreen(
-            testTickets, 20, contentPadding = contentPadding, modifier = modifier.fillMaxWidth()
-        )
-    //ErrorScreen(retryAction, modifier = modifier.fillMaxSize())
+
+        is TicketUiState.Error -> ErrorScreen(retryAction, modifier = modifier.fillMaxSize())
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun TicketsScreenPreview() {
-    TicketsScreen(testTickets, 20, contentPadding = PaddingValues(0.dp), modifier = Modifier.fillMaxWidth())
+    TicketsScreen(
+        testTickets,
+        20,
+        contentPadding = PaddingValues(0.dp)
+    )
 }
 
 @Composable
-fun TicketsScreen(tickets: List<Ticket>, screenTime: Int, contentPadding: PaddingValues, modifier: Modifier) {
+fun TicketsScreen(
+    tickets: List<Ticket>,
+    screenTime: Int,
+    contentPadding: PaddingValues
+) {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-            onClick = { showAwardDialog.value = true }
-        ) {
-            Icon(Icons.Filled.Add, stringResource(id = R.string.award_ticket))
-        }},
+                onClick = { showAwardDialog.value = true }
+            ) {
+                Icon(Icons.Filled.Add, stringResource(id = R.string.award_ticket))
+            }
+        },
         modifier = Modifier.padding(contentPadding)
-    ){ innerPadding ->
+    ) { innerPadding ->
         Column(
             modifier = Modifier.padding(innerPadding)
         ) {
             TodayScreenTime(screenTime)
             Tickets(tickets)
         }
-        RedeemTicketDialog()
-        AwardTicketDialog()
+        //Redeem Ticket Dialog
+        val redeemOptions =
+            TicketRedemption.entries.filter { it.id < 5 }.map { stringResource(id = it.textRes) }
+        GenericDialog(
+            showDialog = showRedeemDialog.value,
+            toggleDialog = { showRedeemDialog.value = !showRedeemDialog.value },
+            options = redeemOptions,
+            title = stringResource(R.string.redeem_ticket),
+            hintText = "",
+            textLabel = stringResource(R.string.note),
+            ok = stringResource(R.string.redeem),
+            cancel = stringResource(R.string.cancel),
+            onOk = { selected, text ->
+                if (selectedCard.value != null) {
+                    val t = selectedCard.value!!.copy(
+                        used = true,
+                        usedDate = Clock.System.now().toString(),
+                        note = text,
+                        redemption = TicketRedemptionMap[selected]!!
+                    )
+                    onRedeemTicket(t)
+                }
+            }
+        )
+        //Award Ticket Dialog
+        val awardOptions =
+            TicketType.entries.filter { it.id < 3 }.map { stringResource(id = it.textRes) }
+        GenericDialog(
+            showDialog = showAwardDialog.value,
+            toggleDialog = { showAwardDialog.value = !showAwardDialog.value },
+            options = awardOptions,
+            title = stringResource(R.string.award_ticket),
+            hintText = "",
+            textLabel = stringResource(R.string.note),
+            ok = stringResource(R.string.award),
+            cancel = stringResource(R.string.cancel),
+            onOk = { selected, text ->
+                onAwardTicket(selected, text)
+            }
+        )
     }
 
 }
@@ -150,7 +194,8 @@ fun TicketCard(ticket: Ticket) {
             if (!ticket.used) {
                 showRedeemDialog.value = true
                 selectedCard.value = ticket
-            } }
+            }
+        }
     ) {
         Box {
             Column {
@@ -212,164 +257,4 @@ fun TicketCard(ticket: Ticket) {
             }
         }
     }
-}
-
-@Composable
-fun RedeemTicketDialog() {
-    val options = TicketRedemption.entries.filter { it.id < 5 }.map { Pair(stringResource(id = it.textRes), it) }
-    val (selectedOption, onOptionSelected) = remember { mutableStateOf(options[0]) }
-    var noteText by remember { mutableStateOf("") }
-    if (showRedeemDialog.value) {
-        AlertDialog(
-            onDismissRequest = {},
-            title = {
-                Text(text = stringResource(R.string.redeem_ticket))
-            },
-            text = {
-                Column() {
-                    Text(text = stringResource(R.string.redeem_ticket_text))
-                    Column(Modifier.selectableGroup()) {
-                        options.forEach { optionPair ->
-                            Row(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .selectable(
-                                        selected = (optionPair.first == selectedOption.first),
-                                        onClick = { onOptionSelected(optionPair) },
-                                        role = Role.RadioButton
-                                    )
-                                    .padding(8.dp),
-                            ) {
-                                RadioButton(
-                                    selected = (optionPair == selectedOption),
-                                    onClick = null
-                                )
-                                Text(
-                                    text = optionPair.first,
-                                    modifier = Modifier
-                                        .align(Alignment.CenterVertically)
-                                        .padding(start = 8.dp)
-                                )
-                            }
-                        }
-                    }
-                    OutlinedTextField(
-                        value = noteText,
-                        onValueChange = {text -> noteText = text},
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        label = { Text(stringResource(R.string.note)) }
-                    )
-                }
-            },
-
-            confirmButton = {
-                TextButton(onClick = {
-                    showRedeemDialog.value = false
-                    if(selectedCard.value != null) {
-                        val t = selectedCard.value!!.copy(
-                            used = true,
-                            usedDate = Clock.System.now().toString(),
-                            note = noteText,
-                            redemption = selectedOption.second
-                        )
-                        onRedeemTicket(t)
-                    }
-                }) {
-                    Text(text = stringResource(R.string.redeem))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showRedeemDialog.value = false }) {
-                    Text(text = stringResource(R.string.cancel))
-                }
-            }
-        )
-    }
-}
-
-@Composable
-fun AwardTicketDialog() {
-    val options = TicketType.entries.filter { it.id < 3 }.map { stringResource(id = it.textRes) }
-    val (selectedOption, onOptionSelected) = remember { mutableStateOf(options[0]) }
-    var noteText by remember { mutableStateOf("") }
-    if (showAwardDialog.value) {
-        AlertDialog(
-            onDismissRequest = {},
-            title = {
-                Text(text = stringResource(R.string.award_ticket))
-            },
-            text = {
-                Column() {
-                    Text(text = stringResource(R.string.award_ticket_text))
-                    Column(Modifier.selectableGroup()) {
-                        options.forEach { text ->
-                            Row(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .selectable(
-                                        selected = (text == selectedOption),
-                                        onClick = { onOptionSelected(text) },
-                                        role = Role.RadioButton
-                                    )
-                                    .padding(8.dp),
-                            ) {
-                                RadioButton(
-                                    selected = (text == selectedOption),
-                                    onClick = null
-                                )
-                                Text(
-                                    text = text,
-                                    modifier = Modifier
-                                        .align(Alignment.CenterVertically)
-                                        .padding(start = 8.dp)
-                                )
-                            }
-                        }
-                    }
-                    OutlinedTextField(
-                        value = noteText,
-                        onValueChange = { text -> noteText = text },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        label = { Text(stringResource(R.string.note)) }
-                    )
-                }
-            },
-
-            confirmButton = {
-                TextButton(onClick = {
-                    onAwardTicket(selectedOption, noteText)
-                    showAwardDialog.value = false
-                }) {
-                    Text(text = stringResource(R.string.award))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showAwardDialog.value = false }) {
-                    Text(text = stringResource(R.string.cancel))
-                }
-            }
-        )
-    }
-}
-
-@Composable
-fun ErrorScreen(x0: () -> Unit, modifier: Modifier) {
-    Text(
-        text = "error"
-    )
-}
-
-@Composable
-fun LoadingScreen(modifier: Modifier, contentPadding: PaddingValues) {
-    Text(
-        text = "loading",
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(contentPadding),
-        textAlign = TextAlign.Center
-    )
 }

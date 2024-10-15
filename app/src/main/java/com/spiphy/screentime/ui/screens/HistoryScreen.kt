@@ -17,9 +17,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.spiphy.screentime.model.Ticket
 import com.spiphy.screentime.model.testTickets
-import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
+import com.spiphy.screentime.ui.screens.components.ErrorScreen
+import com.spiphy.screentime.ui.screens.components.LoadingScreen
 
 @Composable
 fun HistoryScreen(
@@ -29,18 +28,20 @@ fun HistoryScreen(
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     when (historyUiState) {
-        is HistoryUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize(), contentPadding = contentPadding)
+        is HistoryUiState.Loading -> LoadingScreen(
+            modifier = Modifier,
+            contentPadding = contentPadding
+        )
+
         is HistoryUiState.Success -> {
-            //onAwardTicket = { ticketType, note -> viewModel.awardTicket(ticketType, note) }
-            //onRedeemTicket = { ticket -> if(historyUiState.screenTime < max_screen_time) viewModel.redeemTicket(ticket) }
             History(
-                historyUiState.tickets, contentPadding = contentPadding, modifier = modifier.fillMaxWidth()
+                historyUiState.tickets,
+                contentPadding = contentPadding,
+                modifier = modifier.fillMaxWidth()
             )
         }
-        is HistoryUiState.Error -> TicketsScreen(
-            testTickets, 20, contentPadding = contentPadding, modifier = modifier.fillMaxWidth()
-        )
-        //ErrorScreen(retryAction, modifier = modifier.fillMaxSize())
+
+        is HistoryUiState.Error -> ErrorScreen(retryAction, modifier = modifier.fillMaxSize())
     }
 }
 

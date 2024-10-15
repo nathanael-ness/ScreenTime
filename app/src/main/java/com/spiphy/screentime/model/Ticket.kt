@@ -40,6 +40,13 @@ enum class TicketType(val id: Int, @DrawableRes val imageRes: Int, @StringRes va
     STAR(6, R.drawable.star, R.string.award_star)
 }
 
+val TicketRedemptionMap = mapOf<String, TicketRedemption>(
+    "TV Show" to TicketRedemption.TV,
+    "Movie" to TicketRedemption.GAMING,
+    "Video Games" to TicketRedemption.MOVIE,
+    "Phone" to TicketRedemption.PHONE
+)
+
 enum class TicketRedemption(
     val id: Int,
     @DrawableRes val imageRes: Int,

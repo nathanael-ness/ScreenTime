@@ -21,7 +21,7 @@ val testStarGroup = listOf(
         used = false,
         note = "Test",
         earned = 3
-    ),StarGroup(
+    ), StarGroup(
         id = UUID.randomUUID().toString(),
         date = Clock.System.now().toString(),
         used = false,

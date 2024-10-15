@@ -54,8 +54,10 @@ fun ScreenTimeApp() {
         Surface(
             modifier = Modifier.fillMaxSize()
         ) {
-            val ticketViewModel: TicketViewModel = viewModel(factory = TicketViewModel.Companion.Factory)
-            var historyViewModel: HistoryViewModel = viewModel(factory = HistoryViewModel.Companion.Factory)
+            val ticketViewModel: TicketViewModel =
+                viewModel(factory = TicketViewModel.Companion.Factory)
+            var historyViewModel: HistoryViewModel =
+                viewModel(factory = HistoryViewModel.Companion.Factory)
             val starViewModel: StarViewModel = viewModel(factory = StarViewModel.Companion.Factory)
             NavHost(navController = navController, startDestination = "home") {
                 composable(route = "home") {
@@ -69,14 +71,14 @@ fun ScreenTimeApp() {
                 composable(route = "history") {
                     HistoryScreen(
                         historyUiState = historyViewModel.historyUiState,
-                        retryAction = {  },
+                        retryAction = { },
                         contentPadding = innerPadding
                     )
                 }
                 composable(route = "stars") {
                     StarsScreen(
                         viewModel = starViewModel,
-                        retryAction = {  },
+                        retryAction = { },
                         contentPadding = innerPadding
                     )
                 }
@@ -95,7 +97,7 @@ fun BottomBar(x0: NavHostController) {
                 selectedTabIndex = 0
                 x0.navigate("home")
             },
-            icon = {Icon(Icons.Filled.Home, "Home")}
+            icon = { Icon(Icons.Filled.Home, "Home") }
         )
         NavigationBarItem(
             selected = selectedTabIndex == 1,
@@ -103,7 +105,7 @@ fun BottomBar(x0: NavHostController) {
                 selectedTabIndex = 1
                 x0.navigate("history")
             },
-            icon = {Icon(Icons.Filled.Info, "History")}
+            icon = { Icon(Icons.Filled.Info, "History") }
         )
         NavigationBarItem(
             selected = selectedTabIndex == 2,
@@ -111,7 +113,7 @@ fun BottomBar(x0: NavHostController) {
                 selectedTabIndex = 2
                 x0.navigate("stars")
             },
-            icon = {Icon(Icons.Filled.Star, "Stars")}
+            icon = { Icon(Icons.Filled.Star, "Stars") }
         )
     }
 }
