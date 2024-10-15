@@ -53,7 +53,7 @@ fun History(
 ) {
     val usedTickets = tickets.filter { it.used }
     val earnedTickets = tickets.filter { !it.used }
-    val earnedByDate = earnedTickets.groupBy { timeToString(it) }
+    val earnedByDate = earnedTickets.groupBy { Utilities.ticketToTimeString(it) }
     LazyColumn(
         contentPadding = contentPadding,
         modifier = modifier
@@ -103,11 +103,4 @@ fun HistoryCard(ticket: Ticket) {
 @Composable
 fun HistoryScreenPreview() {
     History(testTickets, contentPadding = PaddingValues(0.dp), modifier = Modifier.fillMaxWidth())
-}
-
-private fun timeToString(ticket: Ticket): String {
-    val timestamp = if (ticket.used) ticket.usedDate else ticket.earnedDate
-    val time = Instant.parse(timestamp).toLocalDateTime(timeZone = TimeZone.currentSystemDefault())
-    val displayTime = "${time.dayOfWeek} ${time.month} ${time.dayOfMonth}, ${time.year}"
-    return displayTime
 }

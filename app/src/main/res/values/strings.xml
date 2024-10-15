@@ -41,4 +41,6 @@
     <string name="redeem_ticket">Redeem Ticket</string>
     <string name="award_movie_night">Movie Night</string>
     <string name="award_weekend">Weekend</string>
+    <string name="award_star">Award Star</string>
+    <string name="custom_reason">Custom reason</string>
 </resources>

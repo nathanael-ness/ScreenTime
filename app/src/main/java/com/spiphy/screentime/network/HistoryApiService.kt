@@ -4,6 +4,6 @@ import com.spiphy.screentime.model.Ticket
 import retrofit2.http.GET
 
 interface HistoryApiService {
-    @GET("GetAllTickets")
+    @GET("Ticket/GetAllTickets")
     suspend fun getAllTickets(): List<Ticket>
 }

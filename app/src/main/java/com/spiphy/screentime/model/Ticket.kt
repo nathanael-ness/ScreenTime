@@ -34,10 +34,9 @@ val exclamations = listOf(
 enum class TicketType(val id: Int, @DrawableRes val imageRes: Int, @StringRes val textRes: Int) {
     EFFORT(1, R.drawable.effort, R.string.award_effort),
     BONUS(2, R.drawable.bonus, R.string.award_bonus),
-    STARS(3, R.drawable.star, R.string.award_stars),
-    DAILY(4, R.drawable.daily, R.string.award_daily),
-    MOVIE_NIGHT(5, R.drawable.cinema, R.string.award_movie_night),
-    WEEKEND(6, R.drawable.fireworks, R.string.award_weekend)
+    DAILY(3, R.drawable.daily, R.string.award_daily),
+    MOVIE_NIGHT(4, R.drawable.cinema, R.string.award_movie_night),
+    WEEKEND(5, R.drawable.fireworks, R.string.award_weekend)
 }
 
 enum class TicketRedemption(
@@ -105,7 +104,7 @@ val testTickets = listOf(
         R.string.exclamation_04,
         "Note 4",
         Clock.System.now().toString(),
-        TicketType.STARS,
+        TicketType.EFFORT,
         Clock.System.now().toString(),
         false,
         TicketRedemption.PHONE,

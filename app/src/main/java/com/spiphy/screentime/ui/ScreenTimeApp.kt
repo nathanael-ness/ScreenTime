@@ -37,6 +37,8 @@ import com.spiphy.screentime.R
 import com.spiphy.screentime.ui.screens.HistoryScreen
 import com.spiphy.screentime.ui.screens.HistoryViewModel
 import com.spiphy.screentime.ui.screens.HomeScreen
+import com.spiphy.screentime.ui.screens.StarViewModel
+import com.spiphy.screentime.ui.screens.StarsScreen
 import com.spiphy.screentime.ui.screens.TicketViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -54,6 +56,7 @@ fun ScreenTimeApp() {
         ) {
             val ticketViewModel: TicketViewModel = viewModel(factory = TicketViewModel.Companion.Factory)
             var historyViewModel: HistoryViewModel = viewModel(factory = HistoryViewModel.Companion.Factory)
+            val starViewModel: StarViewModel = viewModel(factory = StarViewModel.Companion.Factory)
             NavHost(navController = navController, startDestination = "home") {
                 composable(route = "home") {
                     HomeScreen(
@@ -71,8 +74,8 @@ fun ScreenTimeApp() {
                     )
                 }
                 composable(route = "stars") {
-                    HistoryScreen(
-                        historyUiState = historyViewModel.historyUiState,
+                    StarsScreen(
+                        viewModel = starViewModel,
                         retryAction = {  },
                         contentPadding = innerPadding
                     )

@@ -8,18 +8,18 @@ import retrofit2.http.POST
 
 interface TicketApiService {
 
-    @GET("GetActiveTickets")
+    @GET("Ticket/GetActiveTickets")
     suspend fun getActiveTickets(): List<Ticket>
 
-    @GET("TodaysUsedScreenTime")
+    @GET("Ticket/TodaysUsedScreenTime")
     suspend fun getTodaysUsedScreenTime(): Int
 
-    @POST("AddTicket")
+    @POST("Ticket/AddTicket")
     suspend fun awardTicket(@Body ticket: Ticket)
 
-    @POST("CreateDailyTicket")
+    @POST("Ticket/CreateDailyTicket")
     suspend fun createDailyTicket()
 
-    @POST("UpdateTicket")
+    @POST("Ticket/UpdateTicket")
     suspend fun redeemTicket(@Body ticket: Ticket)
 }

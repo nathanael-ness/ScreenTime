@@ -56,10 +56,10 @@ import androidx.compose.runtime.setValue
 import kotlinx.datetime.Clock
 
 private val showRedeemDialog = mutableStateOf(false)
+private var onRedeemTicket: (ticket: Ticket) -> Unit = {}
 private val showAwardDialog = mutableStateOf(false)
 private val selectedCard = mutableStateOf<Ticket?>(null)
 private var onAwardTicket: (String, String) -> Unit = { _, _ -> }
-private var onRedeemTicket: (ticket: Ticket) -> Unit = {}
 
 private const val max_screen_time = 120
 
@@ -101,12 +101,13 @@ fun TicketsScreen(tickets: List<Ticket>, screenTime: Int, contentPadding: Paddin
             onClick = { showAwardDialog.value = true }
         ) {
             Icon(Icons.Filled.Add, stringResource(id = R.string.award_ticket))
-        }}
+        }},
+        modifier = Modifier.padding(contentPadding)
     ){ innerPadding ->
         Column(
-            modifier = Modifier.padding(contentPadding)
+            modifier = Modifier.padding(innerPadding)
         ) {
-            TodayScreenTime(screenTime, innerPadding)
+            TodayScreenTime(screenTime)
             Tickets(tickets)
         }
         RedeemTicketDialog()
@@ -116,12 +117,11 @@ fun TicketsScreen(tickets: List<Ticket>, screenTime: Int, contentPadding: Paddin
 }
 
 @Composable
-fun TodayScreenTime(screenTime: Int = 20, contentPadding: PaddingValues) {
+fun TodayScreenTime(screenTime: Int = 20) {
     Text(
         text = "Screen Time used today: $screenTime minutes",
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+            .fillMaxWidth(),
         textAlign = TextAlign.Center
     )
 }
@@ -137,7 +137,7 @@ fun Tickets(tickets: List<Ticket>) {
 
 @Composable
 fun TicketCard(ticket: Ticket) {
-    val displayTime = timeToString(ticket)
+    val displayTime = Utilities.ticketToTimeString(ticket)
     Card(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -212,13 +212,6 @@ fun TicketCard(ticket: Ticket) {
             }
         }
     }
-}
-
-private fun timeToString(ticket: Ticket): String {
-    val timestamp = if (ticket.used) ticket.usedDate else ticket.earnedDate
-    val time = Instant.parse(timestamp).toLocalDateTime(timeZone = TimeZone.currentSystemDefault())
-    val displayTime = "${time.dayOfWeek} ${time.month} ${time.dayOfMonth}, ${time.year}"
-    return displayTime
 }
 
 @Composable
@@ -298,7 +291,7 @@ fun RedeemTicketDialog() {
 
 @Composable
 fun AwardTicketDialog() {
-    val options = TicketType.entries.filter { it.id < 4 }.map { stringResource(id = it.textRes) }
+    val options = TicketType.entries.filter { it.id < 3 }.map { stringResource(id = it.textRes) }
     val (selectedOption, onOptionSelected) = remember { mutableStateOf(options[0]) }
     var noteText by remember { mutableStateOf("") }
     if (showAwardDialog.value) {
