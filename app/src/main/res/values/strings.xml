@@ -43,4 +43,6 @@
     <string name="award_weekend">Weekend</string>
     <string name="award_star">Award Star</string>
     <string name="custom_reason">Custom reason</string>
+    <string name="redeem_star">Redeem Star</string>
+    <string name="custom">Custom</string>
 </resources>

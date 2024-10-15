@@ -1,8 +1,8 @@
 package com.spiphy.screentime.ui.screens
 
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -12,8 +12,10 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.spiphy.screentime.ScreenTimeApplication
 import com.spiphy.screentime.data.StarRepository
+import com.spiphy.screentime.data.TicketRepository
 import com.spiphy.screentime.model.StarGroup
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 
 sealed interface StarUiState {
     data class Success(val starGroups: List<StarGroup>) : StarUiState
@@ -21,7 +23,7 @@ sealed interface StarUiState {
     object Loading : StarUiState
 }
 
-class StarViewModel(private val starRepository: StarRepository) : ViewModel() {
+class StarViewModel(private val starRepository: StarRepository, private val ticketRepository: TicketRepository) : ViewModel() {
     var starUiState: StarUiState by mutableStateOf(StarUiState.Loading)
         private set
 
@@ -47,12 +49,30 @@ class StarViewModel(private val starRepository: StarRepository) : ViewModel() {
         }
     }
 
+    fun redeemStar(starGroup: StarGroup, note: String) {
+        viewModelScope.launch {
+            val sg = starGroup.copy(
+                used = true,
+                date = Clock.System.now().toString()
+            )
+            starRepository.updateStarGroup(sg)
+            getAllStars()
+        }
+    }
+
+    fun convertToScreenTime() {
+        viewModelScope.launch {
+            ticketRepository.awardTicket("STAR", "Stars")
+        }
+    }
+
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application =(this[APPLICATION_KEY] as ScreenTimeApplication)
                 val starRepository = application.container.starRepository
-                StarViewModel(starRepository = starRepository)
+                val ticketRepository = application.container.ticketRepository
+                StarViewModel(starRepository = starRepository, ticketRepository = ticketRepository)
             }
         }
     }

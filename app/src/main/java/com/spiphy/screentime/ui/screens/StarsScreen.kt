@@ -29,19 +29,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.spiphy.screentime.R
 import com.spiphy.screentime.model.StarGroup
 import com.spiphy.screentime.model.testStarGroup
 
 
 private val showAwardDialog = mutableStateOf(false)
+private val showRedeemDialog = mutableStateOf(false)
+private val selectedStarGroup = mutableStateOf<StarGroup?>(null)
 private var onAwardStar: (starNote: String) -> Unit = {}
+private var onRedeemStar: (starGroup: StarGroup, note: String) -> Unit = {_,_ ->}
+private var onConverToScreenTime: () -> Unit = {}
 
 @Composable
 fun StarsScreen(
@@ -58,7 +62,8 @@ fun StarsScreen(
 
         is StarUiState.Success -> {
             onAwardStar = { note -> viewModel.awardStar(note) }
-            //onRedeemTicket = { ticket -> if(historyUiState.screenTime < max_screen_time) viewModel.redeemTicket(ticket) }
+            onRedeemStar = { starGroup, note -> viewModel.redeemStar(starGroup, note) }
+            onConverToScreenTime = { viewModel.convertToScreenTime() }
             Stars(
                 uiState.starGroups, viewModel, contentPadding = contentPadding
             )
@@ -102,6 +107,7 @@ fun Stars(
             }
         }
         AwardStarDialog()
+        RedeemStarDialog()
     }
 
 
@@ -121,11 +127,19 @@ fun StarGroup(
                 onClick = {
                     expanded = !expanded
                 },
-                onLongClick = { }
+                onLongClick = {
+                    if(!starGroup.used) {
+                        selectedStarGroup.value = starGroup
+                        showRedeemDialog.value = true
+                    }
+                }
             )
     ) {
         Row {
-            Column{
+            Column(
+                modifier = Modifier
+                    .alpha(if (starGroup.used) 0.5f else 1.0f)
+            ){
                 Row{
                     for(i in 1..5) {
                         Image(
@@ -221,6 +235,80 @@ fun AwardStarDialog() {
             },
             dismissButton = {
                 TextButton(onClick = { showAwardDialog.value = false }) {
+                    Text(text = stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+}
+
+
+@Composable
+fun RedeemStarDialog() {
+    val options = listOf("Screen Time","Other")
+    val (selectedOption, onOptionSelected) = remember { mutableStateOf(options[0]) }
+    var customText by remember { mutableStateOf("") }
+    if (showRedeemDialog.value) {
+        AlertDialog(
+            onDismissRequest = {},
+            title = {
+                Text(text = stringResource(R.string.redeem_star))
+            },
+            text = {
+                Column {
+                    Column(Modifier.selectableGroup()) {
+                        options.forEach { option ->
+                            Row(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .selectable(
+                                        selected = (option == selectedOption),
+                                        onClick = { onOptionSelected(option) },
+                                        role = Role.RadioButton
+                                    )
+                                    .padding(8.dp),
+                            ) {
+                                RadioButton(
+                                    selected = (option == selectedOption),
+                                    onClick = null
+                                )
+                                Text(
+                                    text = option,
+                                    modifier = Modifier
+                                        .align(Alignment.CenterVertically)
+                                        .padding(start = 8.dp)
+                                )
+                            }
+                        }
+                    }
+                    OutlinedTextField(
+                        value = customText,
+                        onValueChange = {text -> customText = text},
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        label = { Text(stringResource(R.string.custom)) }
+                    )
+                }
+            },
+
+            confirmButton = {
+                TextButton(onClick = {
+                    showRedeemDialog.value = false
+                    var note = customText
+                    if(selectedStarGroup.value != null) {
+                        if(selectedOption == "Screen Time") {
+                            onConverToScreenTime()
+                            note = "Screen Time"
+                        }
+                        onRedeemStar(selectedStarGroup.value!!, note)
+                    }
+                }) {
+                    Text(text = stringResource(R.string.redeem_star))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRedeemDialog.value = false }) {
                     Text(text = stringResource(R.string.cancel))
                 }
             }

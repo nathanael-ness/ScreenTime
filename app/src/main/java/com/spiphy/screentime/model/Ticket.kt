@@ -36,7 +36,8 @@ enum class TicketType(val id: Int, @DrawableRes val imageRes: Int, @StringRes va
     BONUS(2, R.drawable.bonus, R.string.award_bonus),
     DAILY(3, R.drawable.daily, R.string.award_daily),
     MOVIE_NIGHT(4, R.drawable.cinema, R.string.award_movie_night),
-    WEEKEND(5, R.drawable.fireworks, R.string.award_weekend)
+    WEEKEND(5, R.drawable.fireworks, R.string.award_weekend),
+    STAR(6, R.drawable.star, R.string.award_star)
 }
 
 enum class TicketRedemption(
