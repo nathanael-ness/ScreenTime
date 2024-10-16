@@ -42,8 +42,8 @@ enum class TicketType(val id: Int, @DrawableRes val imageRes: Int, @StringRes va
 
 val TicketRedemptionMap = mapOf<String, TicketRedemption>(
     "TV Show" to TicketRedemption.TV,
-    "Movie" to TicketRedemption.GAMING,
-    "Video Games" to TicketRedemption.MOVIE,
+    "Movie" to TicketRedemption.MOVIE,
+    "Video Games" to TicketRedemption.GAMING,
     "Phone" to TicketRedemption.PHONE
 )
 
@@ -62,7 +62,7 @@ enum class TicketRedemption(
 @Serializable
 data class Ticket(
     val id: String = UUID.randomUUID().toString(),
-    @StringRes val exclamationResourceId: Int,
+    val exclamationId: Int,
     val note: String,
     val earnedDate: String,
     val type: TicketType,

@@ -54,6 +54,13 @@ class TicketViewModel(private val ticketRepository: TicketRepository) : ViewMode
         }
     }
 
+    fun deleteTicket(ticket: Ticket) {
+        viewModelScope.launch {
+            ticketRepository.deleteTicket(ticket)
+            update()
+        }
+    }
+
     fun redeemTicket(ticket: Ticket) {
         viewModelScope.launch {
             ticketRepository.redeemTicket(ticket)

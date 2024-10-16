@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -41,26 +42,31 @@ import com.spiphy.screentime.ui.screens.StarViewModel
 import com.spiphy.screentime.ui.screens.StarsScreen
 import com.spiphy.screentime.ui.screens.TicketViewModel
 
+private const val homeScreen = "home"
+private const val historyScreen = "history"
+private const val starsScreen = "stars"
+
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScreenTimeApp() {
     val navController = rememberNavController()
+    val ticketViewModel: TicketViewModel =
+        viewModel(factory = TicketViewModel.Companion.Factory)
+    var historyViewModel: HistoryViewModel =
+        viewModel(factory = HistoryViewModel.Companion.Factory)
+    val starViewModel: StarViewModel = viewModel(factory = StarViewModel.Companion.Factory)
 
     Scaffold(
         topBar = { ScreenTimeAppBar() },
-        bottomBar = { BottomBar(navController) },
+        bottomBar = { BottomBar(navController, ticketViewModel, historyViewModel, starViewModel) },
     ) { innerPadding ->
         Surface(
             modifier = Modifier.fillMaxSize()
         ) {
-            val ticketViewModel: TicketViewModel =
-                viewModel(factory = TicketViewModel.Companion.Factory)
-            var historyViewModel: HistoryViewModel =
-                viewModel(factory = HistoryViewModel.Companion.Factory)
-            val starViewModel: StarViewModel = viewModel(factory = StarViewModel.Companion.Factory)
-            NavHost(navController = navController, startDestination = "home") {
-                composable(route = "home") {
+
+            NavHost(navController = navController, startDestination = homeScreen) {
+                composable(route = homeScreen) {
                     HomeScreen(
                         viewModel = ticketViewModel,
                         ticketUiState = ticketViewModel.ticketUiState,
@@ -68,17 +74,17 @@ fun ScreenTimeApp() {
                         contentPadding = innerPadding
                     )
                 }
-                composable(route = "history") {
+                composable(route = historyScreen) {
                     HistoryScreen(
                         historyUiState = historyViewModel.historyUiState,
-                        retryAction = { },
+                        retryAction = historyViewModel::getAllTickets,
                         contentPadding = innerPadding
                     )
                 }
-                composable(route = "stars") {
+                composable(route = starsScreen) {
                     StarsScreen(
                         viewModel = starViewModel,
-                        retryAction = { },
+                        retryAction = starViewModel::getAllStars,
                         contentPadding = innerPadding
                     )
                 }
@@ -88,32 +94,40 @@ fun ScreenTimeApp() {
 }
 
 @Composable
-fun BottomBar(x0: NavHostController) {
+fun BottomBar(
+    navController: NavHostController,
+    ticketViewModel: TicketViewModel,
+    historyViewModel: HistoryViewModel,
+    starViewModel: StarViewModel
+) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     NavigationBar {
         NavigationBarItem(
             selected = selectedTabIndex == 0,
             onClick = {
                 selectedTabIndex = 0
-                x0.navigate("home")
+                navController.navigate(homeScreen)
+                ticketViewModel.getTickets()
             },
-            icon = { Icon(Icons.Filled.Home, "Home") }
+            icon = { Icon(Icons.Filled.Home, stringResource(R.string.home)) }
         )
         NavigationBarItem(
             selected = selectedTabIndex == 1,
             onClick = {
                 selectedTabIndex = 1
-                x0.navigate("history")
+                navController.navigate(historyScreen)
+                historyViewModel.getAllTickets()
             },
-            icon = { Icon(Icons.Filled.Info, "History") }
+            icon = { Icon(Icons.Filled.Info, stringResource(R.string.history)) }
         )
         NavigationBarItem(
             selected = selectedTabIndex == 2,
             onClick = {
                 selectedTabIndex = 2
-                x0.navigate("stars")
+                starViewModel.getAllStars()
+                navController.navigate(starsScreen)
             },
-            icon = { Icon(Icons.Filled.Star, "Stars") }
+            icon = { Icon(Icons.Filled.Star, stringResource(R.string.stars)) }
         )
     }
 }

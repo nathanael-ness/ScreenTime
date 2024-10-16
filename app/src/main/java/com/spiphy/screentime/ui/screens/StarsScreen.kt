@@ -6,7 +6,6 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -64,7 +63,7 @@ fun StarsScreen(
             )
         }
 
-        is StarUiState.Error -> ErrorScreen(retryAction, modifier = Modifier.fillMaxSize())
+        is StarUiState.Error -> ErrorScreen(retryAction, Modifier)
     }
 }
 
@@ -73,6 +72,7 @@ fun Stars(
     starGroups: List<StarGroup>,
     contentPadding: PaddingValues
 ) {
+    var orderedGroups = starGroups.sortedBy { it.earned }
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
@@ -86,7 +86,7 @@ fun Stars(
         LazyColumn(
             contentPadding = innerPadding,
         ) {
-            items(starGroups) { starGroup ->
+            items(orderedGroups) { starGroup ->
                 StarGroup(
                     starGroup = starGroup,
                     modifier = Modifier
@@ -95,8 +95,8 @@ fun Stars(
                 )
             }
         }
-        //AwardStarDialog()
 
+        //Award Star Dialog
         GenericDialog(
             showDialog = showAwardDialog.value,
             toggleDialog = { showAwardDialog.value = !showAwardDialog.value },
@@ -115,6 +115,7 @@ fun Stars(
             }
         )
 
+        //Redeem Star Dialog
         GenericDialog(
             showDialog = showRedeemDialog.value,
             toggleDialog = { showRedeemDialog.value = !showRedeemDialog.value },
@@ -128,6 +129,7 @@ fun Stars(
                 var note = text
                 if (selectedStarGroup.value != null) {
                     if (selected == "Screen Time") {
+                        onConverToScreenTime()
                         onConverToScreenTime()
                         note = "Screen Time"
                     }

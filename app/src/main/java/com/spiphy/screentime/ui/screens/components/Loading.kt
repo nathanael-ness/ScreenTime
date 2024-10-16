@@ -33,7 +33,7 @@ fun LoadingScreen(modifier: Modifier, contentPadding: PaddingValues) {
         initialValue = 0f,
         targetValue = 360f,
         animationSpec = infiniteRepeatable(
-            animation = tween(75, easing = LinearEasing),
+            animation = tween(750, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
         ), label = "rotation"
     )

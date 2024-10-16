@@ -3,13 +3,13 @@ package com.spiphy.screentime.ui.screens
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -41,7 +41,7 @@ fun HistoryScreen(
             )
         }
 
-        is HistoryUiState.Error -> ErrorScreen(retryAction, modifier = modifier.fillMaxSize())
+        is HistoryUiState.Error -> ErrorScreen(retryAction, Modifier)
     }
 }
 
@@ -55,25 +55,53 @@ fun History(
     val usedTickets = tickets.filter { it.used }
     val earnedTickets = tickets.filter { !it.used }
     val earnedByDate = earnedTickets.groupBy { Utilities.ticketToTimeString(it) }
+    val usedTicketsByDate = usedTickets.groupBy { Utilities.ticketToTimeString(it) }
     LazyColumn(
         contentPadding = contentPadding,
         modifier = modifier
     ) {
         stickyHeader {
-            Text(text = "Used Tickets")
-        }
-        items(usedTickets) { ticket ->
-            HistoryCard(ticket)
-        }
-        stickyHeader {
-            Text(text = "Earned Tickets")
+            Text(
+                text = "Earned Tickets",
+                modifier = Modifier
+                    .padding(4.dp),
+                style = MaterialTheme.typography.displaySmall
+            )
         }
         earnedByDate.forEach { (date, tickets) ->
             stickyHeader {
-                Text(text = date)
+                Text(
+                    text = date,
+                    modifier = Modifier
+                        .padding(8.dp),
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
             items(tickets) { ticket ->
                 HistoryCard(ticket)
+            }
+        }
+        if (!usedTickets.isEmpty()) {
+            stickyHeader {
+                Text(
+                    text = "Used Tickets",
+                    modifier = Modifier
+                        .padding(4.dp),
+                    style = MaterialTheme.typography.displaySmall
+                )
+            }
+            usedTicketsByDate.forEach { (date, tickets) ->
+                stickyHeader {
+                    Text(
+                        text = date,
+                        modifier = Modifier
+                            .padding(8.dp),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+                items(tickets) { ticket ->
+                    HistoryCard(ticket)
+                }
             }
         }
     }

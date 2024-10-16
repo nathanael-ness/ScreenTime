@@ -1,6 +1,8 @@
 package com.spiphy.screentime.ui.screens
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,7 +10,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -40,6 +41,7 @@ import com.spiphy.screentime.model.Ticket
 import com.spiphy.screentime.model.TicketRedemption
 import com.spiphy.screentime.model.TicketRedemptionMap
 import com.spiphy.screentime.model.TicketType
+import com.spiphy.screentime.model.exclamations
 import com.spiphy.screentime.model.testTickets
 import com.spiphy.screentime.ui.screens.components.ErrorScreen
 import com.spiphy.screentime.ui.screens.components.GenericDialog
@@ -51,6 +53,7 @@ private var onRedeemTicket: (ticket: Ticket) -> Unit = {}
 private val showAwardDialog = mutableStateOf(false)
 private val selectedCard = mutableStateOf<Ticket?>(null)
 private var onAwardTicket: (String, String) -> Unit = { _, _ -> }
+private var deleteTicket: (ticket: Ticket) -> Unit = {}
 
 private const val max_screen_time = 120
 
@@ -64,7 +67,7 @@ fun HomeScreen(
 ) {
     when (ticketUiState) {
         is TicketUiState.Loading -> LoadingScreen(
-            modifier = Modifier,
+            modifier = modifier,
             contentPadding = contentPadding
         )
 
@@ -73,6 +76,7 @@ fun HomeScreen(
             onRedeemTicket = { ticket ->
                 if (ticketUiState.screenTime < max_screen_time) viewModel.redeemTicket(ticket)
             }
+            deleteTicket = { ticket -> viewModel.deleteTicket(ticket) }
             TicketsScreen(
                 ticketUiState.tickets,
                 ticketUiState.screenTime,
@@ -80,7 +84,7 @@ fun HomeScreen(
             )
         }
 
-        is TicketUiState.Error -> ErrorScreen(retryAction, modifier = modifier.fillMaxSize())
+        is TicketUiState.Error -> ErrorScreen(retryAction, Modifier)
     }
 }
 
@@ -179,6 +183,7 @@ fun Tickets(tickets: List<Ticket>) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TicketCard(ticket: Ticket) {
     val displayTime = Utilities.ticketToTimeString(ticket)
@@ -189,13 +194,17 @@ fun TicketCard(ticket: Ticket) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp)
-            .defaultMinSize(minHeight = 64.dp),
-        onClick = {
-            if (!ticket.used) {
-                showRedeemDialog.value = true
-                selectedCard.value = ticket
-            }
-        }
+            .defaultMinSize(minHeight = 64.dp)
+            .combinedClickable(
+                onClick = {
+                    if (!ticket.used) {
+                        showRedeemDialog.value = true
+                        selectedCard.value = ticket
+                    }
+                },
+                onLongClick = { deleteTicket(ticket) }
+            )
+
     ) {
         Box {
             Column {
@@ -216,7 +225,7 @@ fun TicketCard(ticket: Ticket) {
                             .weight(1.0f)
                             .align(Alignment.CenterVertically)
                             .padding(10.dp),
-                        text = stringResource(id = ticket.exclamationResourceId)
+                        text = stringResource(id = exclamations[ticket.exclamationId])
                     )
                     Image(
                         modifier = Modifier
