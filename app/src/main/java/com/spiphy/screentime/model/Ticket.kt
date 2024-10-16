@@ -76,7 +76,7 @@ data class Ticket(
 val testTickets = listOf(
     Ticket(
         UUID.randomUUID().toString(),
-        R.string.exclamation_01,
+        0,
         "Note 1",
         Clock.System.now().toString(),
         TicketType.DAILY,
@@ -87,7 +87,7 @@ val testTickets = listOf(
     ),
     Ticket(
         UUID.randomUUID().toString(),
-        R.string.exclamation_02,
+        1,
         "Note 2",
         Clock.System.now().toString(),
         TicketType.EFFORT,
@@ -98,7 +98,7 @@ val testTickets = listOf(
     ),
     Ticket(
         UUID.randomUUID().toString(),
-        R.string.exclamation_03,
+        2,
         "Note 3",
         Clock.System.now().toString(),
         TicketType.BONUS,
@@ -109,7 +109,7 @@ val testTickets = listOf(
     ),
     Ticket(
         UUID.randomUUID().toString(),
-        R.string.exclamation_04,
+        3,
         "Note 4",
         Clock.System.now().toString(),
         TicketType.EFFORT,
@@ -120,7 +120,7 @@ val testTickets = listOf(
     ),
     Ticket(
         UUID.randomUUID().toString(),
-        R.string.exclamation_05,
+        4,
         "Note 5",
         Clock.System.now().toString(),
         TicketType.EFFORT,
@@ -131,7 +131,7 @@ val testTickets = listOf(
     ),
     Ticket(
         UUID.randomUUID().toString(),
-        R.string.exclamation_06,
+        5,
         "Note 6",
         Clock.System.now().toString(),
         TicketType.EFFORT,
@@ -142,7 +142,7 @@ val testTickets = listOf(
     ),
     Ticket(
         UUID.randomUUID().toString(),
-        R.string.exclamation_07,
+        6,
         "Note 7",
         Clock.System.now().toString(),
         TicketType.EFFORT,
@@ -153,7 +153,7 @@ val testTickets = listOf(
     ),
     Ticket(
         UUID.randomUUID().toString(),
-        R.string.exclamation_08,
+        7,
         "Note 8",
         Clock.System.now().toString(),
         TicketType.EFFORT,
@@ -164,7 +164,7 @@ val testTickets = listOf(
     ),
     Ticket(
         UUID.randomUUID().toString(),
-        R.string.exclamation_09,
+        8,
         "Note 9",
         Clock.System.now().toString(),
         TicketType.EFFORT,
@@ -175,7 +175,7 @@ val testTickets = listOf(
     ),
     Ticket(
         UUID.randomUUID().toString(),
-        R.string.exclamation_10,
+        9,
         "Note 10",
         Clock.System.now().toString(),
         TicketType.EFFORT,
@@ -186,7 +186,7 @@ val testTickets = listOf(
     ),
     Ticket(
         UUID.randomUUID().toString(),
-        R.string.exclamation_11,
+        10,
         "Note 11",
         Clock.System.now().toString(),
         TicketType.EFFORT,
@@ -197,7 +197,7 @@ val testTickets = listOf(
     ),
     Ticket(
         UUID.randomUUID().toString(),
-        R.string.exclamation_12,
+        11,
         "Note 12",
         Clock.System.now().toString(),
         TicketType.BONUS,
@@ -208,7 +208,7 @@ val testTickets = listOf(
     ),
     Ticket(
         UUID.randomUUID().toString(),
-        R.string.exclamation_13,
+        12,
         "Note 13",
         Clock.System.now().toString(),
         TicketType.BONUS,
@@ -219,7 +219,7 @@ val testTickets = listOf(
     ),
     Ticket(
         UUID.randomUUID().toString(),
-        R.string.exclamation_14,
+        13,
         "Note 14",
         Clock.System.now().toString(),
         TicketType.BONUS,
@@ -230,7 +230,7 @@ val testTickets = listOf(
     ),
     Ticket(
         UUID.randomUUID().toString(),
-        R.string.exclamation_15,
+        14,
         "Note 15",
         Clock.System.now().toString(),
         TicketType.BONUS,
@@ -241,7 +241,7 @@ val testTickets = listOf(
     ),
     Ticket(
         UUID.randomUUID().toString(),
-        R.string.exclamation_16,
+        15,
         "Note 16",
         Clock.System.now().toString(),
         TicketType.BONUS,
@@ -252,7 +252,7 @@ val testTickets = listOf(
     ),
     Ticket(
         UUID.randomUUID().toString(),
-        R.string.exclamation_17,
+        16,
         "Note 17",
         Clock.System.now().toString(),
         TicketType.BONUS,
@@ -263,7 +263,7 @@ val testTickets = listOf(
     ),
     Ticket(
         UUID.randomUUID().toString(),
-        R.string.exclamation_18,
+        17,
         "Note 18",
         Clock.System.now().toString(),
         TicketType.BONUS,
@@ -274,7 +274,7 @@ val testTickets = listOf(
     ),
     Ticket(
         UUID.randomUUID().toString(),
-        R.string.exclamation_19,
+        18,
         "Note 19",
         Clock.System.now().toString(),
         TicketType.BONUS,
@@ -285,7 +285,7 @@ val testTickets = listOf(
     ),
     Ticket(
         UUID.randomUUID().toString(),
-        R.string.exclamation_20,
+        20,
         "Note 20",
         Clock.System.now().toString(),
         TicketType.BONUS,

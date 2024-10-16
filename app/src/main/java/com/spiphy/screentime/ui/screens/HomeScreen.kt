@@ -176,8 +176,13 @@ fun TodayScreenTime(screenTime: Int = 20) {
 
 @Composable
 fun Tickets(tickets: List<Ticket>) {
+    val used = tickets.filter { it.used }
+    val unused = tickets.filter { !it.used }
     LazyColumn {
-        items(tickets) { ticket ->
+        items(unused) { ticket ->
+            TicketCard(ticket)
+        }
+        items(used) { ticket ->
             TicketCard(ticket)
         }
     }
@@ -248,6 +253,7 @@ fun TicketCard(ticket: Ticket) {
                     Text(
                         text = ticket.note,
                         style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.padding(end = 8.dp)
                     )
                 }
             }
@@ -266,4 +272,10 @@ fun TicketCard(ticket: Ticket) {
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun TicketCardPreview() {
+    TicketCard(testTickets[0])
 }
