@@ -32,6 +32,7 @@ import com.spiphy.screentime.model.testStarGroup
 import com.spiphy.screentime.ui.screens.components.ErrorScreen
 import com.spiphy.screentime.ui.screens.components.GenericDialog
 import com.spiphy.screentime.ui.screens.components.LoadingScreen
+import com.spiphy.screentime.writeEnabled
 
 
 private val showAwardDialog = mutableStateOf(false)
@@ -39,7 +40,7 @@ private val showRedeemDialog = mutableStateOf(false)
 private val selectedStarGroup = mutableStateOf<StarGroup?>(null)
 private var onAwardStar: (starNote: String) -> Unit = {}
 private var onRedeemStar: (starGroup: StarGroup, note: String) -> Unit = { _, _ -> }
-private var onConverToScreenTime: () -> Unit = {}
+private var onConvertToScreenTime: () -> Unit = {}
 
 @Composable
 fun StarsScreen(
@@ -55,9 +56,11 @@ fun StarsScreen(
         )
 
         is StarUiState.Success -> {
-            onAwardStar = { note -> viewModel.awardStar(note) }
-            onRedeemStar = { starGroup, note -> viewModel.redeemStar(starGroup, note) }
-            onConverToScreenTime = { viewModel.convertToScreenTime() }
+            if(writeEnabled) {
+                onAwardStar = { note -> viewModel.awardStar(note) }
+                onRedeemStar = { starGroup, note -> viewModel.redeemStar(starGroup, note) }
+                onConvertToScreenTime = { viewModel.convertToScreenTime() }
+            }
             Stars(
                 uiState.starGroups, contentPadding = contentPadding
             )
@@ -129,8 +132,8 @@ fun Stars(
                 var note = text
                 if (selectedStarGroup.value != null) {
                     if (selected == "Screen Time") {
-                        onConverToScreenTime()
-                        onConverToScreenTime()
+                        onConvertToScreenTime()
+                        onConvertToScreenTime()
                         note = "Screen Time"
                     }
                     onRedeemStar(selectedStarGroup.value!!, note)

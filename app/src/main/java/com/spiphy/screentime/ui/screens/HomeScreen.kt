@@ -46,6 +46,7 @@ import com.spiphy.screentime.model.testTickets
 import com.spiphy.screentime.ui.screens.components.ErrorScreen
 import com.spiphy.screentime.ui.screens.components.GenericDialog
 import com.spiphy.screentime.ui.screens.components.LoadingScreen
+import com.spiphy.screentime.writeEnabled
 import kotlinx.datetime.Clock
 
 private val showRedeemDialog = mutableStateOf(false)
@@ -72,16 +73,19 @@ fun HomeScreen(
         )
 
         is TicketUiState.Success -> {
-            onAwardTicket = { ticketType, note -> viewModel.awardTicket(ticketType, note) }
-            onRedeemTicket = { ticket ->
-                if (ticketUiState.screenTime < max_screen_time) viewModel.redeemTicket(ticket)
+            if (writeEnabled) {
+                onAwardTicket = { ticketType, note -> viewModel.awardTicket(ticketType, note) }
+                onRedeemTicket = { ticket ->
+                    if (ticketUiState.screenTime < max_screen_time) viewModel.redeemTicket(ticket)
+                }
+                deleteTicket = { ticket -> viewModel.deleteTicket(ticket) }
             }
-            deleteTicket = { ticket -> viewModel.deleteTicket(ticket) }
             TicketsScreen(
                 ticketUiState.tickets,
                 ticketUiState.screenTime,
                 contentPadding = contentPadding
             )
+
         }
 
         is TicketUiState.Error -> ErrorScreen(retryAction, Modifier)
