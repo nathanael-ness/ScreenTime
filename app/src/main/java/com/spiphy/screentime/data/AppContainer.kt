@@ -5,8 +5,11 @@ import com.spiphy.screentime.network.HistoryApiService
 import com.spiphy.screentime.network.StarApiService
 import com.spiphy.screentime.network.TicketApiService
 import kotlinx.serialization.json.Json
+import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
+import com.spiphy.screentime.BuildConfig
 
 interface AppContainer {
     val ticketRepository: TicketRepository
@@ -14,10 +17,27 @@ interface AppContainer {
     val starRepository: StarRepository
 }
 
+class ApiKeyInterceptor : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
+        val request = chain
+            .request()
+            .newBuilder()
+            .addHeader("X-API-Key", BuildConfig.SERVER_APIKEY)
+            .build()
+        return chain.proceed(request)
+    }
+}
+
 class DefaultAppContainer : AppContainer {
     private val baseUrl = "https://screentime.ness.nohost.me/api/"
 
+    private val apiKeyInterceptor = ApiKeyInterceptor()
+    private val builder = OkHttpClient().newBuilder()
+        .addInterceptor(apiKeyInterceptor)
+
+
     private val retrofit: Retrofit = Retrofit.Builder()
+        .client(builder.build())
         .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
         .baseUrl(baseUrl)
         .build()

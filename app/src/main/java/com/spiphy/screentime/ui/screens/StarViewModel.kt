@@ -15,7 +15,6 @@ import com.spiphy.screentime.data.StarRepository
 import com.spiphy.screentime.data.TicketRepository
 import com.spiphy.screentime.model.StarGroup
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 
 sealed interface StarUiState {
     data class Success(val starGroups: List<StarGroup>) : StarUiState
@@ -56,7 +55,6 @@ class StarViewModel(
         viewModelScope.launch {
             val sg = starGroup.copy(
                 used = true,
-                date = Clock.System.now().toString(),
                 note = note
             )
             starRepository.updateStarGroup(sg)
