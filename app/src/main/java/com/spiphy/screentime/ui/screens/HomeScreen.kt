@@ -48,6 +48,7 @@ import com.spiphy.screentime.ui.screens.components.GenericDialog
 import com.spiphy.screentime.ui.screens.components.LoadingScreen
 import com.spiphy.screentime.writeEnabled
 import kotlinx.datetime.Clock
+import kotlin.math.min
 
 private val showRedeemDialog = mutableStateOf(false)
 private var onRedeemTicket: (ticket: Ticket) -> Unit = {}
@@ -121,7 +122,8 @@ fun TicketsScreen(
         Column(
             modifier = Modifier.padding(innerPadding)
         ) {
-            TodayScreenTime(screenTime)
+            val maxScreenTime = min(tickets.filter { t -> !t.used }.sumOf { it.time }, 120)
+            TodayScreenTime(maxScreenTime, screenTime)
             Tickets(tickets)
         }
         //Redeem Ticket Dialog
@@ -169,9 +171,9 @@ fun TicketsScreen(
 }
 
 @Composable
-fun TodayScreenTime(screenTime: Int = 20) {
+fun TodayScreenTime(maxScreenTimeToday: Int, screenTime: Int = 20) {
     Text(
-        text = "Screen Time used today: $screenTime minutes",
+        text = "Screen Time used today: $screenTime minutes of $maxScreenTimeToday minutes",
         modifier = Modifier
             .fillMaxWidth(),
         textAlign = TextAlign.Center
