@@ -19,6 +19,9 @@ import com.spiphy.screentime.model.Ticket
 import com.spiphy.screentime.model.testTickets
 import com.spiphy.screentime.ui.screens.components.ErrorScreen
 import com.spiphy.screentime.ui.screens.components.LoadingScreen
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 @Composable
 fun HistoryScreen(
@@ -55,7 +58,15 @@ fun History(
     val usedTickets = tickets.filter { it.used }
     val earnedTickets = tickets.filter { !it.used }
     val earnedByDate = earnedTickets.groupBy { Utilities.ticketToTimeString(it) }
+    val earnedByDates = earnedByDate.keys.sortedByDescending {
+        val date = earnedByDate[it]!![0].usedDate
+        Instant.parse(date).toLocalDateTime(timeZone = TimeZone.currentSystemDefault())
+    }
     val usedTicketsByDate = usedTickets.groupBy { Utilities.ticketToTimeString(it) }
+    val usedTicketsByDates = usedTicketsByDate.keys.sortedByDescending {
+        val date = usedTicketsByDate[it]!![0].usedDate
+        Instant.parse(date).toLocalDateTime(timeZone = TimeZone.currentSystemDefault())
+    }
     LazyColumn(
         contentPadding = contentPadding,
         modifier = modifier
@@ -68,7 +79,8 @@ fun History(
                 style = MaterialTheme.typography.displaySmall
             )
         }
-        earnedByDate.forEach { (date, tickets) ->
+        earnedByDates.forEach { date ->
+            val tickets = earnedByDate[date]!!
             stickyHeader {
                 Text(
                     text = date,
@@ -90,7 +102,8 @@ fun History(
                     style = MaterialTheme.typography.displaySmall
                 )
             }
-            usedTicketsByDate.forEach { (date, tickets) ->
+            usedTicketsByDates.forEach { date ->
+                val tickets = usedTicketsByDate[date]!!
                 stickyHeader {
                     Text(
                         text = date,

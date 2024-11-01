@@ -33,6 +33,9 @@ import com.spiphy.screentime.ui.screens.components.ErrorScreen
 import com.spiphy.screentime.ui.screens.components.GenericDialog
 import com.spiphy.screentime.ui.screens.components.LoadingScreen
 import com.spiphy.screentime.writeEnabled
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 
 private val showAwardDialog = mutableStateOf(false)
@@ -56,7 +59,7 @@ fun StarsScreen(
         )
 
         is StarUiState.Success -> {
-            if(writeEnabled) {
+            if (writeEnabled) {
                 onAwardStar = { note -> viewModel.awardStar(note) }
                 onRedeemStar = { starGroup, note -> viewModel.redeemStar(starGroup, note) }
                 onConvertToScreenTime = { viewModel.convertToScreenTime() }
@@ -75,7 +78,16 @@ fun Stars(
     starGroups: List<StarGroup>,
     contentPadding: PaddingValues
 ) {
-    var orderedGroups = starGroups.sortedBy { it.earned }
+    var unredeemedStarGroups = starGroups
+        .filter { it.used == false }
+        .sortedByDescending {
+            Instant.parse(it.date).toLocalDateTime(timeZone = TimeZone.currentSystemDefault())
+        }
+    var redeemedStarGroups = starGroups
+        .filter { it.used == true }
+        .sortedByDescending {
+            Instant.parse(it.date).toLocalDateTime(timeZone = TimeZone.currentSystemDefault())
+        }
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
@@ -89,7 +101,15 @@ fun Stars(
         LazyColumn(
             contentPadding = innerPadding,
         ) {
-            items(orderedGroups) { starGroup ->
+            items(unredeemedStarGroups) { starGroup ->
+                StarGroup(
+                    starGroup = starGroup,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp)
+                )
+            }
+            items(redeemedStarGroups) { starGroup ->
                 StarGroup(
                     starGroup = starGroup,
                     modifier = Modifier
@@ -190,7 +210,11 @@ fun StarGroup(
                     }
                 }
                 if (expanded) {
-                    starGroup.stars.forEach { star ->
+                    val starDetails = starGroup.stars.sortedBy {
+                        Instant.parse(it.date)
+                            .toLocalDateTime(timeZone = TimeZone.currentSystemDefault())
+                    }
+                    starDetails.forEach { star ->
                         Text(
                             modifier = Modifier.padding(2.dp),
                             text = "${star.note} - ${Utilities.starToTimeString(star)}"
